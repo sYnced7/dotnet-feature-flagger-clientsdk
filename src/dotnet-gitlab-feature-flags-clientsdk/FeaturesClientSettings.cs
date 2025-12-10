@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace FeatureFlags.ClientSdk
+﻿namespace FeatureFlags.ClientSdk
 {
     public sealed class FeaturesClientSettings
     {
