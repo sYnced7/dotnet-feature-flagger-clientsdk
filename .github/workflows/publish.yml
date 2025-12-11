@@ -1,4 +1,4 @@
-name: 📦 Publish NuGet Package
+name:  Publish NuGet Package
 
 on:
   push:

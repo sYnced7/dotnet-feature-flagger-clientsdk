@@ -1,4 +1,4 @@
-name: 🧪 Manual Beta Package Publish
+name: Manual Beta Package Publish
 
 on:
   workflow_dispatch:
