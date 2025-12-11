@@ -153,8 +153,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/output/FeatureFlags.ClientSdk.${{ steps.final_version.outputs.version }}.nupkg
-          asset_name: FeatureFlags.ClientSdk.${{ steps.final_version.outputs.version }}.nupkg
+          asset_path: ${{ github.workspace }}/output/FeatureFlagger.ClientSdk.${{ steps.final_version.outputs.version }}.nupkg
+          asset_name: FeatureFlagger.ClientSdk.${{ steps.final_version.outputs.version }}.nupkg
           asset_content_type: application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
