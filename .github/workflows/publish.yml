@@ -1,0 +1,150 @@
+name: 🧪 Manual NuGet & Beta Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build (leave empty for current branch)"
+        required: false
+        default: ""
+      prerelease_suffix:
+        description: "Prerelease suffix (e.g., beta, alpha, rc)"
+        required: true
+        default: "beta"
+      override_version:
+        description: "Optional version override (manual)"
+        required: false
+        default: ""
+
+env:
+  PROJECT_PATH: 'src/dotnet-gitlab-feature-flags-clientsdk/FeatureFlagger.clientSdk.csproj'
+
+jobs:
+  publish_nuget:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - name: 0. Determine branch
+        id: resolve_branch
+        run: |
+          if [ "${{ github.event.inputs.branch }}" != "" ]; then
+            echo "branch=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.head_ref }}" != "" ]; then
+            echo "branch=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+          echo "Resolved branch: ${{ steps.resolve_branch.outputs.branch }}"
+
+      - name: 1. Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve_branch.outputs.branch }}
+          fetch-depth: 0
+
+      - name: 2. Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0'
+
+      - name: 3a. Calculate Semantic Version
+        id: semver
+        if: github.event.inputs.override_version == ''
+        uses: iautom8things/semantic-version@v4.0.5
+        with:
+          major_pattern: '^(BREAKING|major|breaking change)'
+          minor_pattern: '^(feat|minor|feature)'
+          patch_pattern: '^(fix|patch|chore)'
+          prerelease_label: ${{ github.event.inputs.prerelease_suffix }}
+          version_format: '${major}.${minor}.${patch}-${prerelease_label}.${increment}'
+
+      - name: 3b. Use manual version override if provided
+        id: version_override
+        if: github.event.inputs.override_version != ''
+        run: echo "version=${{ github.event.inputs.override_version }}" >> $GITHUB_OUTPUT
+
+      - name: 3c. Resolve final version
+        id: final_version
+        run: |
+          if [ "${{ github.event.inputs.override_version }}" != "" ]; then
+            echo "version=${{ github.event.inputs.override_version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ steps.semver.outputs.version }}" >> $GITHUB_OUTPUT
+
+      - name: 3d. Check if version already exists
+        id: check_tag
+        run: |
+          tag="v${{ steps.final_version.outputs.version }}"
+          exists=$(git ls-remote --tags origin $tag)
+          if [ "$exists" != "" ]; then
+            echo "Tag $tag already exists, stopping workflow."
+            exit 1
+          fi
+
+      - name: 4. Build & Pack NuGet Package
+        id: pack
+        run: |
+          echo "Building version ${{ steps.final_version.outputs.version }}"
+
+          dotnet build ${{ env.PROJECT_PATH }} --configuration Release
+          
+          dotnet pack ${{ env.PROJECT_PATH }} \
+            --configuration Release \
+            --no-build \
+            -o ${{ github.workspace }}/output \
+            -p:PackageVersion=${{ steps.final_version.outputs.version }}
+
+      - name: 5. Generate changelog
+        id: changelog
+        run: |
+          echo "### Changes" > changelog.md
+          git log origin/main..HEAD --pretty=format:"- %s (%h)" >> changelog.md
+          echo "log<<EOF" >> $GITHUB_OUTPUT
+          cat changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 6. Create Git Tag
+        run: |
+          tag="v${{ steps.final_version.outputs.version }}"
+          git tag $tag
+          git push origin $tag
+
+      - name: 7. Create GitHub Release Draft
+        id: release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ steps.final_version.outputs.version }}"
+          release_name: "v${{ steps.final_version.outputs.version }}"
+          draft: true
+          body: ${{ steps.changelog.outputs.log }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 8. Upload .nupkg to Release Draft
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/output/*.nupkg
+          asset_name: package-${{ steps.final_version.outputs.version }}.nupkg
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 9. Publish to NuGet.org
+        run: |
+          dotnet nuget push ${{ github.workspace }}/output/*.nupkg \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --skip-duplicate
+
+      - name: 10. Add GitHub Summary
+        run: |
+          echo "## 🧪 Beta / NuGet Release" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ steps.final_version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`v${{ steps.final_version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ steps.resolve_branch.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "### Changelog" >> $GITHUB_STEP_SUMMARY
+          echo "```\n${{ steps.changelog.outputs.log }}\n```" >> $GITHUB_STEP_SUMMARY

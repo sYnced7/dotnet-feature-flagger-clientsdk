@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatureFlagger.clientSdk", "dotnet-gitlab-feature-flags-clientsdk\FeatureFlagger.clientSdk.csproj", "{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{34F218EE-6082-4BDB-9055-1E8D22151EFF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8CB6F31-FCAD-469E-AB35-C817E2B8A9CB}
+	EndGlobalSection
+EndGlobal
