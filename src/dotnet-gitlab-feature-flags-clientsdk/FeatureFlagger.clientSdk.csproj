@@ -8,7 +8,7 @@
     <Authors>Helder Rodrigues</Authors>
     <Description>An alternative for unleash client for gitlab feature flags.</Description>
     <RepositoryUrl>https://github.com/sYnced7/dotnet-feature-flagger-clientsdk</RepositoryUrl>
-    <PackageLicenseExpression>Apache 2.0</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
