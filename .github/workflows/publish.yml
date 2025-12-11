@@ -38,12 +38,15 @@ jobs:
       - name: 0. Resolve branch
         id: resolve_branch
         run: |
-          if [ "${{ github.event.inputs.branch }}" != "" ]; then
-            echo "branch=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.head_ref }}" != "" ]; then
-            echo "branch=${{ github.head_ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          BRANCH="${GITHUB_REF_NAME:-main}"
+
+          if [ -n "${{ github.event.inputs.branch }}" ]; then
+            BRANCH="${{ github.event.inputs.branch }}"
+          elif [ -n "${GITHUB_HEAD_REF}" ]; then
+            BRANCH="${GITHUB_HEAD_REF}"
+          fi
+
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: 1. Checkout
         uses: actions/checkout@v4
