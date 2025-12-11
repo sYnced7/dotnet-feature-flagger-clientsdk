@@ -1,18 +1,26 @@
-name: 🧪 Manual NuGet & Beta Publish
+name: Manual NuGet Release Pipeline
 
 on:
   workflow_dispatch:
     inputs:
+      release_type:
+        description: "Type of release: beta or stable"
+        required: true
+        default: "beta"
+        type: choice
+        options:
+          - beta
+          - stable
       branch:
         description: "Branch to build (leave empty for current branch)"
         required: false
         default: ""
       prerelease_suffix:
         description: "Prerelease suffix (e.g., beta, alpha, rc)"
-        required: true
+        required: false
         default: "beta"
       override_version:
-        description: "Optional version override (manual)"
+        description: "Optional manual version override"
         required: false
         default: ""
 
@@ -20,14 +28,14 @@ env:
   PROJECT_PATH: 'src/dotnet-gitlab-feature-flags-clientsdk/FeatureFlagger.clientSdk.csproj'
 
 jobs:
-  publish_nuget:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: read
 
     steps:
-      - name: 0. Determine branch
+      - name: 0. Resolve branch
         id: resolve_branch
         run: |
           if [ "${{ github.event.inputs.branch }}" != "" ]; then
@@ -52,7 +60,7 @@ jobs:
 
       - name: 3a. Calculate Semantic Version
         id: semver
-        if: github.event.inputs.override_version == ''
+        if: github.event.inputs.override_version == '' && github.event.inputs.release_type == 'beta'
         uses: iautom8things/semantic-version@v4.0.5
         with:
           major_pattern: '^(BREAKING|major|breaking change)'
@@ -71,16 +79,20 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.override_version }}" != "" ]; then
             echo "version=${{ github.event.inputs.override_version }}" >> $GITHUB_OUTPUT
-          else
+          elif [ "${{ github.event.inputs.release_type }}" == "beta" ] && [ "${{ steps.semver.outputs.version }}" != "" ]; then
             echo "version=${{ steps.semver.outputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Stable release fallback
+            echo "version=$(date +%Y.%m.%d).0" >> $GITHUB_OUTPUT
+          fi
 
-      - name: 3d. Check if version already exists
+      - name: 3d. Check if tag exists
         id: check_tag
         run: |
           tag="v${{ steps.final_version.outputs.version }}"
           exists=$(git ls-remote --tags origin $tag)
           if [ "$exists" != "" ]; then
-            echo "Tag $tag already exists, stopping workflow."
+            echo "Tag $tag already exists. Stopping workflow."
             exit 1
           fi
 
@@ -88,9 +100,7 @@ jobs:
         id: pack
         run: |
           echo "Building version ${{ steps.final_version.outputs.version }}"
-
           dotnet build ${{ env.PROJECT_PATH }} --configuration Release
-          
           dotnet pack ${{ env.PROJECT_PATH }} \
             --configuration Release \
             --no-build \
@@ -142,7 +152,8 @@ jobs:
 
       - name: 10. Add GitHub Summary
         run: |
-          echo "## 🧪 Beta / NuGet Release" >> $GITHUB_STEP_SUMMARY
+          echo "## NuGet Release Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Type:** \`${{ github.event.inputs.release_type }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** \`${{ steps.final_version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Tag:** \`v${{ steps.final_version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ steps.resolve_branch.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
