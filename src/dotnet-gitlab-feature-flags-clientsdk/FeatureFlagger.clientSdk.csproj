@@ -4,7 +4,7 @@
     <TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
     <RootNamespace>FeatureFlags.ClientSdk</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
-    <PackageId>FeatureFlags.ClientSdk</PackageId>
+    <PackageId>FeatureFlagger.ClientSdk</PackageId>
     <Authors>Helder Rodrigues</Authors>
     <Description>An alternative for unleash client for gitlab feature flags.</Description>
     <RepositoryUrl>https://github.com/sYnced7/dotnet-feature-flagger-clientsdk</RepositoryUrl>
