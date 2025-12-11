@@ -100,6 +100,7 @@ jobs:
           if [ "$exists" != "" ]; then
             echo "Tag $tag already exists. Stopping workflow."
             exit 1
+          fi
 
       - name: 4. Build & Pack NuGet Package
         id: pack
