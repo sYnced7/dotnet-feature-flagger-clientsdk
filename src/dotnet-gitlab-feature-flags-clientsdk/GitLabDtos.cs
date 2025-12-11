@@ -1,5 +1,7 @@
 ﻿namespace FeatureFlags.ClientSdk
 {
+    using System.Collections.Generic;
+    
     public sealed class GitLabUnleashResponse
     {
         public IEnumerable<GitLabFeature> Features { get; set; }

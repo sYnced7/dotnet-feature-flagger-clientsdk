@@ -1,5 +1,7 @@
 ﻿namespace FeatureFlags.ClientSdk.Evaluation
 {
+    using System.Linq;
+    
     using FeatureFlags.ClientSdk.Evaluation.Models;
 
     internal sealed class Evaluators

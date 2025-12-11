@@ -1,0 +1,67 @@
+name: 🧪 Manual Beta Package Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Feature Branch Name (e.g., feature/my-new-feature)'
+        required: true
+        default: ${{ github.ref_name }}
+      prerelease_suffix:
+        description: 'Prerelease Suffix (e.g., beta, alpha, rc)'
+        required: true
+        default: 'beta'
+
+env:
+  PROJECT_PATH: 'src/dotnet-gitlab-feature-flags-clientsdk/FeatureFlagger.clientSdk.csproj'
+
+jobs:
+  publish_beta:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 1. Checkout Feature Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+
+      - name: 2. Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0'
+
+      - name: 3. Calculate Prerelease Version
+        id: semver
+        uses: iautom8things/semantic-version@v4.0.5
+        with:
+          major_pattern: '^(BREAKING|major|breaking change)'
+          minor_pattern: '^(feat|minor|feature)'
+          patch_pattern: '^(fix|patch|chore)'
+          
+          prerelease_label: ${{ github.event.inputs.prerelease_suffix }}
+          
+          version_format: '${major}.${minor}.${patch}-${prerelease_label}.${increment}'
+
+      - name: 4. Build and Pack NuGet Package
+        id: pack
+        run: |
+          echo "Calculated Beta Version: ${{ steps.semver.outputs.version }}"
+          
+          # Restore, Build, and Pack the project
+          dotnet build ${{ env.PROJECT_PATH }} --configuration Release
+          
+          # Use 'dotnet pack' and pass the calculated version as a property
+          dotnet pack ${{ env.PROJECT_PATH }} \
+            --configuration Release \
+            --no-build \
+            -o ${{ github.workspace }}/output \
+            -p:PackageVersion=${{ steps.semver.outputs.version }}
+
+      - name: 5. Publish Beta Package to NuGet.org
+        run: dotnet nuget push ${{ github.workspace }}/output/*.nupkg \
+          --source https://api.nuget.org/v3/index.json \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --skip-duplicate

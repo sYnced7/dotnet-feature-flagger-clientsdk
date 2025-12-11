@@ -1,5 +1,9 @@
 ﻿namespace FeatureFlags.ClientSdk
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading.Tasks;
     using System.Text.Json;
 
     using FeatureFlags.ClientSdk.Evaluation;
@@ -10,9 +14,9 @@
         private readonly HttpClient httpClient;
         private readonly string apiUrl;
 
-        public FeaturesClient(FeaturesClientSettings settings, HttpClient httpClient = null)
+        public FeaturesClient(FeaturesClientSettings settings, HttpClient httpClient)
         {
-            this.httpClient = httpClient ?? new HttpClient();
+            this.httpClient = httpClient;
             apiUrl = $"https://gitlab.com/api/v4/feature_flags/unleash/{settings.ProjectId}/client/features";
 
             httpClient.DefaultRequestHeaders.Add("UNLEASH-APPNAME", settings.AppName);
@@ -46,8 +50,8 @@
                 {
                     Name = s.Name,
                     Parameters = s.Parameters
-                }).ToList()
-            }).AsEnumerable();
+                })
+            });
         }
     }
 }

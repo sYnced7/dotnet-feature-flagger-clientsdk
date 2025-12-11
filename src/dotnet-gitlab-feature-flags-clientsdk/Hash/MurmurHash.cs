@@ -1,7 +1,8 @@
-﻿using System.Text;
-
-namespace FeatureFlags.ClientSdk
+﻿namespace FeatureFlags.ClientSdk
 {
+    using System;
+    using System.Text;
+    
     internal sealed class MurmurHash
     {
         public static uint MurmurHash3(string input, uint seed = 0)
