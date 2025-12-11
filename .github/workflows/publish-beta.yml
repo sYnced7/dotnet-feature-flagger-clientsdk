@@ -1,10 +1,10 @@
-name: Manual Beta Package Publish
+name: 🧪 Manual Beta Package Publish
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Feature Branch Name (e.g., feature/my-new-feature)'
+        description: 'Branch to build (Leave as "main" to run on the current branch).'
         required: true
         default: 'main'
       prerelease_suffix:
@@ -22,18 +22,23 @@ jobs:
       contents: read
 
     steps:
-      - name: 1. Checkout Feature Branch
+      - name: 1. Checkout Target Branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ github.event.inputs.branch == 'main' && github.sha || github.event.inputs.branch }}
           fetch-depth: 0
 
-      - name: 2. Setup .NET SDK
+      - name: 2. Display Branch Context
+        run: |
+          echo "Checked out branch ref: ${{ github.ref }}"
+          echo "Building Prerelease: ${{ github.event.inputs.prerelease_suffix }}"
+
+      - name: 3. Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0'
 
-      - name: 3. Calculate Prerelease Version
+      - name: 4. Calculate Prerelease Version
         id: semver
         uses: iautom8things/semantic-version@v4.0.5
         with:
@@ -45,7 +50,7 @@ jobs:
           
           version_format: '${major}.${minor}.${patch}-${prerelease_label}.${increment}'
 
-      - name: 4. Build and Pack NuGet Package
+      - name: 5. Build and Pack NuGet Package
         id: pack
         run: |
           echo "Calculated Beta Version: ${{ steps.semver.outputs.version }}"
@@ -60,7 +65,7 @@ jobs:
             -o ${{ github.workspace }}/output \
             -p:PackageVersion=${{ steps.semver.outputs.version }}
 
-      - name: 5. Publish Beta Package to NuGet.org
+      - name: 6. Publish Beta Package to NuGet.org
         run: dotnet nuget push ${{ github.workspace }}/output/*.nupkg \
           --source https://api.nuget.org/v3/index.json \
           --api-key ${{ secrets.NUGET_API_KEY }} \
