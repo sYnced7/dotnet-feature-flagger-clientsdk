@@ -27,9 +27,38 @@ This project is a **community-driven alternative** to simplify working with feat
 
 ## 💡 Usage Example
 
+Without context:
 ```csharp
-tbd
+var featureClientSettings = new FeaturesClientSettings()
+{
+    AppName = "environent",
+    ProjectId = 1234455653,
+    InstanceId = "glffct--instanceId",
+};
+var httpClient = new HttpClient();
+var featureClient = new FeaturesClient(featureClientSettings, httpClient);
+
+var result = await featureClient.IsEnabledAsync("test-flag");
 ```
+
+With context:
+```csharp
+var featureClientSettings = new FeaturesClientSettings()
+{
+    AppName = "environent",
+    ProjectId = 1234455653,
+    InstanceId = "glffct--instanceId",
+};
+var httpClient = new HttpClient();
+var featureClient = new FeaturesClient(featureClientSettings, httpClient);
+
+var result = await featureClient.IsEnabledAsync("test-flag", new FlagContext()
+{
+    UserId = "Some UserId"
+});
+```
+
+The context can be enriched with additional properties as needed and as gitlab limitations.
 
 ## 📝 License
 
