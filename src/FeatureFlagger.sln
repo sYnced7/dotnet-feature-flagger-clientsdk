@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatureFlagger.clientSdk", "dotnet-gitlab-feature-flags-clientsdk\FeatureFlagger.clientSdk.csproj", "{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{34F218EE-6082-4BDB-9055-1E8D22151EFF}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -12,16 +10,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatureFlagger.ClientSdk.Tests", "FeatureFlagger.ClientSdk.Tests\FeatureFlagger.ClientSdk.Tests.csproj", "{A4187816-7010-40B9-81FE-5E0220D6933A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatureFlagger.ClientSdk", "dotnet-gitlab-feature-flags-clientsdk\FeatureFlagger.ClientSdk.csproj", "{6D246AA7-5254-4161-8582-671EB858C49F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E9A6F0C-EDCE-4D10-B34F-DA8A7F532E37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4187816-7010-40B9-81FE-5E0220D6933A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4187816-7010-40B9-81FE-5E0220D6933A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4187816-7010-40B9-81FE-5E0220D6933A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4187816-7010-40B9-81FE-5E0220D6933A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D246AA7-5254-4161-8582-671EB858C49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D246AA7-5254-4161-8582-671EB858C49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D246AA7-5254-4161-8582-671EB858C49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D246AA7-5254-4161-8582-671EB858C49F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
