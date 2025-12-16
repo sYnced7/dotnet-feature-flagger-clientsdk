@@ -25,7 +25,7 @@ on:
         default: ""
 
 env:
-  PROJECT_PATH: 'src/dotnet-gitlab-feature-flags-clientsdk/FeatureFlagger.clientSdk.csproj'
+  PROJECT_PATH: 'src/dotnet-gitlab-feature-flags-clientsdk/FeatureFlagger.ClientSdk.csproj'
 
 jobs:
   publish:
