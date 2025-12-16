@@ -37,8 +37,9 @@ var featureClientSettings = new FeaturesClientSettings()
 };
 var httpClient = new HttpClient();
 var featureClient = new FeaturesClient(featureClientSettings, httpClient);
+var defaultValue = true;
 
-var result = await featureClient.IsEnabledAsync("test-flag");
+var result = await featureClient.IsEnabledAsync("test-flag", defaultValue);
 ```
 
 With context:
@@ -51,8 +52,9 @@ var featureClientSettings = new FeaturesClientSettings()
 };
 var httpClient = new HttpClient();
 var featureClient = new FeaturesClient(featureClientSettings, httpClient);
+var defaultValue = false;
 
-var result = await featureClient.IsEnabledAsync("test-flag", new FlagContext()
+var result = await featureClient.IsEnabledAsync("test-flag",  defaultValue, new FlagContext()
 {
     UserId = "Some UserId"
 });

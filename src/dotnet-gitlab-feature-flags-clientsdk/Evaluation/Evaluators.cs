@@ -6,13 +6,35 @@
 
     internal sealed class Evaluators
     {
-        public static int GetNormalizedNumber(string identifier, int groupId)
+      public static bool IsEnabled(Feature feature, FlagContext context)
+      {
+            if (!feature.Enabled)
+            {
+              return false;
+            }
+
+            if (!feature.Strategies.Any())
+            {
+              return feature.Enabled;
+            }
+                
+            foreach (var strategy in feature.Strategies)
+            {
+              if (EvaluateStrategy(strategy, feature, context))
+              {
+                return true;
+              }
+            }
+
+            return false;
+        }
+        private static int GetNormalizedNumber(string identifier, int groupId)
         {
             var hash = MurmurHash.MurmurHash3(identifier + groupId);
             return (int)(hash % 100) + 1;
         }
 
-        public static bool EvaluateFlexibleRollout(
+        private static bool EvaluateFlexibleRollout(
             string featureName,
             FlagContext context,
             int rolloutPercentage,
@@ -50,21 +72,7 @@
             return bucket <= rolloutPercentage;
         }
 
-        public static bool IsEnabled(Feature feature, FlagContext context)
-        {
-            if (!feature.Enabled)
-                return false;
-
-            foreach (var strategy in feature.Strategies)
-            {
-                if (EvaluateStrategy(strategy, feature, context))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool EvaluateStrategy(Strategy strategy, Feature feature, FlagContext ctx)
+        private static bool EvaluateStrategy(Strategy strategy, Feature feature, FlagContext ctx)
         {
             switch (strategy.Name)
             {

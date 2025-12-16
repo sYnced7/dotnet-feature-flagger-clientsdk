@@ -1,4 +1,6 @@
-﻿namespace FeatureFlags.ClientSdk
+﻿using System;
+
+namespace FeatureFlags.ClientSdk
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -23,35 +25,48 @@
             httpClient.DefaultRequestHeaders.Add("UNLEASH-INSTANCEID", settings.InstanceId);
         }
 
-        public async Task<bool> IsEnabledAsync(string toggleName, FlagContext context = null)
+        public async Task<bool> IsEnabledAsync(string toggleName, bool defaultValue, FlagContext context = null)
         {
             var features = await LoadFeaturesAsync();
 
             var toggle = features.FirstOrDefault(f => f.Name == toggleName);
 
+            if (toggle == null)
+            {
+              return defaultValue;
+            }
+
             return Evaluators.IsEnabled(toggle, context);
         }
 
+
         private async Task<IEnumerable<Feature>> LoadFeaturesAsync()
         {
+          try
+          {
             var json = await httpClient.GetStringAsync(apiUrl);
 
             var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+              PropertyNameCaseInsensitive = true
             };
             var gitlabResponse = JsonSerializer.Deserialize<GitLabUnleashResponse>(json, options);
 
             return gitlabResponse.Features.Select(f => new Feature
             {
-                Name = f.Name,
-                Enabled = f.Enabled,
-                Strategies = f.Strategies.Select(s => new Strategy
-                {
-                    Name = s.Name,
-                    Parameters = s.Parameters
-                })
+              Name = f.Name,
+              Enabled = f.Enabled,
+              Strategies = f.Strategies.Select(s => new Strategy
+              {
+                Name = s.Name,
+                Parameters = s.Parameters
+              })
             });
+          }
+          catch (Exception e)
+          {
+            return Enumerable.Empty<Feature>();
+          }
         }
     }
 }
