@@ -92,7 +92,7 @@ public class EvaluatorsTests
           {
             Name = "flexibleRollout",
             Parameters = new Dictionary<string, string>
-              { { "rolloutPercentage", "50" }, { "stickiness", "default" } }
+              { { "rollout", "50" }, { "stickiness", "default" },  }
           }
         })
       .Create();
