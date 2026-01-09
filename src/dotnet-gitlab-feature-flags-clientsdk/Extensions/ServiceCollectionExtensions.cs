@@ -15,6 +15,7 @@
                 .Get<FeaturesClientSettings>();
 
             services.AddSingleton(settings);
+            services.AddMemoryCache();
             services.AddHttpClient<FeaturesClient>();
             services.AddScoped<FeaturesClient>();
 

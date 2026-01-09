@@ -81,7 +81,7 @@
 
                 case "flexibleRollout":
                     int percentage = int.Parse(strategy.Parameters["rollout"]);
-                    string groupId = strategy.Parameters["groupId"];
+                    strategy.Parameters.TryGetValue("groupId", out var groupId);
                     int stickiness = 0;
                     return EvaluateFlexibleRollout(feature.Name, ctx, percentage, stickiness, groupId);
 
