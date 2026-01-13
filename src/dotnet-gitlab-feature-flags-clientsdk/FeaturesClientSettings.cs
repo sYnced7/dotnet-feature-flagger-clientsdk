@@ -6,6 +6,6 @@
         public string AppName { get; set; }
         public string InstanceId { get; set; }
         public bool UseMemoryCache { get; set; }
-        public int MemoryCacheDurationInSeconds { get; set; }
+        public int MemoryCacheDurationInSeconds { get; set; } = 60;
     }
 }
